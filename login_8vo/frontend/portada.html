@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prácticas de Proyectos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">Gestión de Prácticas</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="irAPractica('plantilla')">Práctica 1 - Plantilla</a>
+                    </li>
+                    <li class="nav-item" id="nav-basica">
+                        <a class="nav-link" href="#" onclick="irAPractica('basica')">Práctica 2 - Práctica Básica</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="irAPractica('otra')">Práctica 3 - Otra</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <button class="btn btn-outline-light btn-sm me-3" onclick="toggleDarkMode()" id="btnTheme">🌙</button>
+                    <span class="navbar-text text-white me-3" id="userInfo"></span>
+                    <button class="btn btn-danger btn-sm" onclick="logout()">Salir</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+  
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="alert alert-info shadow-sm d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                        <strong>Usuario actual:</strong> <span id="userInfoDetalle"></span>
+                    </div>
+                    <div id="adminControls" style="display: none;">
+                        <a href="registro.html" class="btn btn-primary btn-sm">
+                            <i class="bi bi-person-plus-fill me-1"></i> Agregar Usuario
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-4 mb-3">
+                <div class="card h-100 shadow-sm border-primary">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Práctica 1 - Plantilla</h5>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <p class="card-text">Visualización de plantilla estática.</p>
+                        <button class="btn btn-primary mt-auto" onclick="irAPractica('plantilla')">Acceder</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-3" id="basicacard">
+                <div class="card h-100 shadow-sm border-success">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">Proyectos</h5>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <p class="card-text">Gestión completa de proyectos y responsables con base de datos.</p>
+                        <button class="btn btn-success mt-auto" onclick="irAPractica('basica')">Acceder</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <div class="card h-100 shadow-sm border-warning">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0">Práctica 3 - Otra</h5>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <p class="card-text">Espacio para futuros desarrollos.</p>
+                        <button class="btn btn-warning mt-auto" onclick="irAPractica('otra')">Acceder</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const usuario = localStorage.getItem('usuario');
+        const rol = localStorage.getItem('rol');
+
+        if (!usuario) {
+            window.location.href = 'login.html';
+        }
+
+        document.getElementById('userInfo').textContent = `${usuario} (${rol})`;
+        document.getElementById('userInfoDetalle').textContent = `${usuario} - Rol asignado: ${rol}`;
+
+        // LÓGICA PARA MOSTRAR EL BOTÓN SI ES ADMIN
+        if (rol === 'admin') {
+            document.getElementById('adminControls').style.display = 'block';
+        }
+
+        function irAPractica(tipo) {
+            switch(tipo) {
+                case 'plantilla':
+                    window.location.href = 'plantilla.html';
+                    break;
+                case 'basica':
+                    /*if (rol !== 'admin') {
+                        alert('Acceso restringido: Se requieren permisos de administrador.');
+                        return;
+                    }*/
+                    window.location.href = 'practica_basica.html';
+                    break;
+                case 'otra':
+                    window.location.href = 'otra.html';
+                    break;
+            }
+        }
+
+        async function logout() {
+            await fetch('http://localhost:3000/api/logout', { method: 'POST', credentials: 'include' });
+            localStorage.clear();
+            window.location.href = 'login.html';
+        }
+
+        function toggleDarkMode() {
+            const htmlElement = document.documentElement;
+            const currentTheme = htmlElement.getAttribute('data-bs-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            htmlElement.setAttribute('data-bs-theme', newTheme);
+            document.getElementById('btnTheme').textContent = newTheme === 'dark' ? '☀️' : '🌙';
+            localStorage.setItem('theme', newTheme);
+        }
+
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.setAttribute('data-bs-theme', 'dark');
+            const btn = document.getElementById('btnTheme');
+            if(btn) btn.textContent = '☀️';
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
